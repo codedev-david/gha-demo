@@ -1,0 +1,24 @@
+# .github/workflows/hello.yml - your first workflow
+name: Hello                        # the workflow's name in the Actions tab
+run-name: Hello from ${{ github.actor }} (${{ github.event_name }})
+
+on:                                # the events (triggers) that start a run
+  push:                            # every push, to any branch
+  workflow_dispatch:               # adds a "Run workflow" button
+
+permissions:                       # what the automatic GITHUB_TOKEN may do
+  contents: read
+
+jobs:                              # a map of jobs; they run in parallel
+  greet:                           # the job id
+    runs-on: ubuntu-latest         # a fresh GitHub-hosted runner for this job
+    steps:                         # a list: each item starts with "- "
+      - name: Check out the repository
+        uses: actions/checkout@v7  # "uses" runs an action
+      - name: Say hello
+        run: echo "Hello, GitHub Actions!"   # "run" runs shell commands
+      - name: Look around the runner
+        run: |                     # "|" keeps line breaks: a multi-line script
+          echo "Runner OS: $RUNNER_OS"
+          echo "Workspace: $GITHUB_WORKSPACE"
+          ls -la

@@ -2,7 +2,7 @@ name: Scheduled
 
 on:
   schedule:
-    - cron: '*/1 * * * *'     # every minute, the minimum; in UTC unless timezone: is set
+    - cron: '*/5 * * * *'     # every minute, the minimum; in UTC unless timezone: is set
   workflow_dispatch:
 
 permissions:

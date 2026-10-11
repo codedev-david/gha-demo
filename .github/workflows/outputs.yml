@@ -1,0 +1,52 @@
+name: Outputs
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}    # a job output, from a step output
+    steps:
+      - name: Write a step output
+        id: version
+        run: echo "version=1.0.$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Write an environment variable for the next steps
+        run: echo "BUILD_LABEL=build-${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
+
+      - name: Read both
+        run: echo "output=${{ steps.version.outputs.version }} env=$BUILD_LABEL"
+
+      - name: Workflow commands
+        run: |
+          echo "::notice title=Version::Building ${{ steps.version.outputs.version }}"
+          echo "::warning file=README.md,line=1,title=Docs::README has no status badge yet"
+          echo "::group::Tool versions"
+          node --version
+          npm --version
+          echo "::endgroup::"
+          TOKEN="tok-$RANDOM$RANDOM"
+          echo "::add-mask::$TOKEN"
+          echo "The generated token is $TOKEN"
+
+      - name: Write the job summary
+        run: |
+          {
+            echo "## Build ${{ steps.version.outputs.version }}"
+            echo "| Item | Value |"
+            echo "| --- | --- |"
+            echo "| Commit | \`${GITHUB_SHA::7}\` |"
+            echo "| Label | $BUILD_LABEL |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  consume:
+    needs: produce
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read the other job's output
+        run: echo "produce built version ${{ needs.produce.outputs.version }}"

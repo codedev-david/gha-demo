@@ -1,7 +1,7 @@
 // adding a new function to subtract two numbers
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { add, multiply } = require("../src/calculator");
+const { add, multiply, subtract } = require("../src/calculator");
 
 test("add returns the sum", () => {
   assert.equal(add(2, 3), 5);

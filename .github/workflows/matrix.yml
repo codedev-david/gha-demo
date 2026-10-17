@@ -1,0 +1,43 @@
+name: Matrix
+
+on:
+  workflow_dispatch:
+    inputs:
+      fail-fast:
+        description: Cancel the other jobs when one fails
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Node ${{ matrix.node-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: ${{ inputs.fail-fast }}
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [22, 24]
+        exclude:                     # drop one combination
+          - os: windows-latest
+            node-version: 22
+        include:                     # add one, with an extra variable
+          - os: ubuntu-latest
+            node-version: 26
+            experimental: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Simulate a failure on the experimental entry
+        if: ${{ matrix.experimental }}
+        run: |
+          echo "::error::Node ${{ matrix.node-version }} is experimental and this check failed"
+          exit 1

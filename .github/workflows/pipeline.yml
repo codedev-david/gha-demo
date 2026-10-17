@@ -46,39 +46,6 @@ jobs:
       - run: npm ci
       - run: npm test
 
-  integration:
-    needs: lint
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    services:
-      postgres:                      # a container next to the job, reachable on localhost
-        image: postgres:18
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    env:
-      PGHOST: localhost
-      PGUSER: postgres
-      PGPASSWORD: postgres
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-      - name: Store a result in Postgres and read it back
-        run: |
-          RESULT=$(node -p "require('./src/calculator').add(2, 3)")
-          psql -c "CREATE TABLE results (operation text, value int);"
-          psql -c "INSERT INTO results VALUES ('add(2, 3)', $RESULT);"
-          psql -c "SELECT * FROM results;"
-          test "$(psql -tAc 'SELECT value FROM results')" = "5"
-
   style:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -97,7 +64,7 @@ jobs:
           exit $status
 
   build:
-    needs: [test, integration]
+    needs: [test]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:

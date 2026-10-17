@@ -9,3 +9,7 @@ test("add returns the sum", () => {
 test("multiply returns the product", () => {
   assert.equal(multiply(4, 5), 20);
 });
+
+test("subtract returns the difference", () => {
+  assert.equal(subtract(10, 4), 6);
+});

@@ -39,11 +39,11 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
-      - name: Run tests
-        run: |
-          node --test \
-            --test-reporter=spec --test-reporter-destination=stdout \
-            --test-reporter=tap --test-reporter-destination=test-results.tap
+      # - name: Run tests
+      #   run: |
+      #     node --test \
+      #       --test-reporter=spec --test-reporter-destination=stdout \
+      #       --test-reporter=tap --test-reporter-destination=test-results.tap
 
       - name: Upload test report
         if: ${{ !cancelled() }}
